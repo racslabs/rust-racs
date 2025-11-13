@@ -4,3 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+rmp = "0.8.14"
+num-complex = "0.4"
+mur3 = "0.1"
+crc32c = "0.6"
+uuid = { version = "1", features = ["v4"] }

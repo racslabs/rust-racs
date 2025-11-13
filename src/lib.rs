@@ -1,21 +1,20 @@
-pub mod connection;
+pub mod socket;
+pub mod pack;
+mod frame;
 
 #[cfg(test)]
 mod tests {
-    use crate::connection::{send, ConnectionPool};
-    use super::*;
+    use crate::socket::{send, SocketPool};
+    use crate::pack::unpack;
 
     #[test]
     fn it_works() {
-        let pool = ConnectionPool::new("localhost:6381", 1);
+        let pool = SocketPool::new("127.0.0.1:6381", 1);
         let mut socket = pool.get().unwrap();
+        let res = send(&mut socket, "ls '*'\0".as_bytes());
 
-        let res = send(&mut socket, "ls\'*\'\0".as_bytes()).expect("panic message");
-
-        let s = String::from_utf8_lossy(&res);
-        println!("{}", s);
-
+        let r = unpack(res.unwrap().as_slice()).unwrap();
         pool.put(socket);
-        pool.close();
+        println!("{:?}", r);
     }
 }
