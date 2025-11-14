@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 pub fn pack(data: &[i32], bit_depth: u16) -> Option<Vec<u8>> {
@@ -28,4 +29,8 @@ pub fn session_id() -> [u8; 16] {
 pub fn hash(bytes: &[u8]) -> u64 {
     let (h1, _) = mur3::murmurhash3_x64_128(bytes, 0);
     h1
+}
+
+pub fn rfc3339(timestamp: DateTime<Utc>) -> String {
+    timestamp.format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string()
 }

@@ -1,0 +1,31 @@
+use crate::command::Command;
+use crate::pack::Types;
+use crate::pipeline::Pipeline;
+use crate::socket::SocketPool;
+
+const DEFAULT_POOL_SIZE: usize = 2;
+
+pub struct Client {
+    command: Command
+}
+
+impl Client {
+    pub fn new(address: &str) -> Self {
+        let pool = SocketPool::new(address, DEFAULT_POOL_SIZE);
+        Self { command: Command::new(pool) }
+    }
+    
+    pub fn with_pool_size(address: &str, pool_size: usize) -> Self {
+        let pool = SocketPool::new(address, pool_size);
+        Self { command: Command::new(pool) }
+    }
+
+    pub fn execute_command(&self, command: &str) -> Result<Types, String> {
+        self.command.execute_command(command)
+    }
+
+    pub fn pipeline(&'_ self) -> Pipeline<'_> {
+        Pipeline::new(&self.command)
+    }
+}
+
