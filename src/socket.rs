@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
-use std::io::{BufReader, Read, Result, Write};
+use std::io::{BufReader, BufWriter, Read, Result, Write};
 use std::net::{SocketAddr, TcpStream};
 use std::str::FromStr;
 use std::usize;
@@ -23,7 +23,6 @@ impl SocketPool {
             socket.set_nodelay(true).unwrap();
             pool.lock().unwrap().push_back(socket);
         }
-
 
         Self { pool,  size}
     }
@@ -48,16 +47,22 @@ impl SocketPool {
 
 pub fn send(stream: &mut TcpStream, data: &[u8]) -> Result<Vec<u8>> {
     let prefix = data.len().to_le_bytes();
-    stream.write_all(&prefix)?;
-    stream.write_all(data)?;
-    stream.flush()?;
+
+    {
+        let mut writer = BufWriter::new(&mut *stream);
+        writer.write_all(&prefix)?;
+        writer.write_all(data)?;
+        writer.flush()?;
+    }
+
+    let mut reader = BufReader::new(stream);
 
     let mut len_buf = [0u8; 8];
-    stream.read_exact(&mut len_buf)?;
+    reader.read_exact(&mut len_buf)?;
     let len = u64::from_le_bytes(len_buf) as usize;
 
     let mut buf = vec![0u8; len];
-    BufReader::new(stream).read_exact(&mut buf)?;
+    reader.read_exact(&mut buf)?;
 
     Ok(buf)
 }

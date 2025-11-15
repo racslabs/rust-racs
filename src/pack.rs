@@ -45,8 +45,7 @@ fn unpack_bool(mut reader: &[u8]) -> Result<Types, String> {
     Ok(Types::Bool(v))
 }
 
-fn unpack_nil(mut reader: &[u8]) -> Result<Types, String> {
-    decode::read_nil(&mut reader).unwrap();
+fn unpack_nil() -> Result<Types, String> {
     Ok(Types::Nil)
 }
 
@@ -161,7 +160,7 @@ pub fn unpack(buf: &[u8]) -> Result<Types, String> {
         "bool"        => { unpack_bool(&mut reader) }
         "int"         => { unpack_int(&mut reader) }
         "float"       => { unpack_float(&mut reader) }
-        "null"        => { unpack_nil(&mut reader) }
+        "null"        => { unpack_nil() }
         "u8v" | "s8v" => { unpack_u8v(&mut reader) }
         "u16v"        => { unpack_u16v(&mut reader) }
         "s16v"        => { unpack_s16v(&mut reader) }

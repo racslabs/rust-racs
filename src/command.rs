@@ -4,12 +4,12 @@ use crate::frame::Frame;
 use crate::pack::{unpack, Types};
 
 
-pub(crate) struct Info {
-    pub(crate) stream_id: String,
-    pub(crate) channels: u16,
-    pub(crate) sample_rate: u32,
-    pub(crate) bit_depth: u16,
-    pub(crate) chunk_size: u16,
+pub struct Info {
+    pub stream_id: String,
+    pub channels: u16,
+    pub sample_rate: u32,
+    pub bit_depth: u16,
+    pub chunk_size: u16,
 }
 
 pub struct Command {
@@ -40,12 +40,17 @@ impl Command {
     }
 
     pub fn execute_command(&self, cmd: &str) -> Result<Types, String> {
-        let _cmd = cmd.to_string() + "\0";
-
         let mut socket = self.pool.get().unwrap();
-        let response = send(&mut socket, cmd.as_bytes()).unwrap();
+        let mut bytes = cmd.as_bytes().to_vec();
+
+        bytes.push('\0' as u8);
+        let response = send(&mut socket, bytes.as_slice()).unwrap();
         self.pool.put(socket);
 
         unpack(response.as_slice())
+    }
+
+    pub fn get_pool(self) -> SocketPool {
+        self.pool
     }
 }

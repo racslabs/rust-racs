@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
-use crate::command::Command;
+use crate::command::{Command, Info};
 use crate::pack::Types;
-use crate::{command, utils};
+use crate::utils;
 
 
 pub struct Pipeline<'a> {
@@ -74,11 +74,16 @@ impl<'a> Pipeline<'a> {
 
     pub fn execute(&mut self) -> Result<Types, String> {
         let command = self.commands.join(" |> ");
+        println!("{}", command);
         self.command.execute_command(command.as_str())
     }
 
     pub fn reset(&mut self) {
         self.commands.clear();
+    }
+
+    pub fn stream(&mut self, info: &Info, data: &[i32]) ->  Result<(), String> {
+        self.command.stream(info, data)
     }
 
 }

@@ -1,5 +1,5 @@
 
-use crate::command::Info;
+pub use crate::command::Info;
 use crate::utils;
 
 const DEFAULT_FLAGS: u8 = 0x0;
@@ -37,7 +37,7 @@ impl Frame {
         bytes.extend_from_slice(self.channels.to_le_bytes().as_ref());
         bytes.extend_from_slice(self.sample_rate.to_le_bytes().as_ref());
         bytes.extend_from_slice(self.bit_depth.to_le_bytes().as_ref());
-        bytes.extend_from_slice(block.len().to_le_bytes().as_ref());
+        bytes.extend_from_slice((block.len() as u16).to_le_bytes().as_ref());
         bytes.push(self.flags);
         bytes.extend_from_slice(block);
         bytes
