@@ -10,7 +10,7 @@ pub enum Types {
     Bool(bool),
     Str(String),
     Err(String),
-    Nil,
+    NULL,
     U8V(Vec<u8>),
     U16V(Vec<u16>),
     S16V(Vec<i16>),
@@ -46,7 +46,7 @@ fn unpack_bool(mut reader: &[u8]) -> Result<Types, String> {
 }
 
 fn unpack_nil() -> Result<Types, String> {
-    Ok(Types::Nil)
+    Ok(Types::NULL)
 }
 
 fn unpack_u8v(mut reader: &[u8]) -> Result<Types, String> {

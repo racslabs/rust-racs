@@ -4,14 +4,6 @@ use crate::frame::Frame;
 use crate::pack::{unpack, Types};
 
 
-pub struct Info {
-    pub stream_id: String,
-    pub channels: u16,
-    pub sample_rate: u32,
-    pub bit_depth: u16,
-    pub chunk_size: u16,
-}
-
 pub struct Command {
     pool: SocketPool
 }
@@ -21,12 +13,20 @@ impl Command {
         Self { pool }
     }
 
-    pub fn stream(&self, info: &Info, data: &[i32]) -> Result<(), String> {
-        let frame = Frame::new(info);
-        let n = info.chunk_size / info.bit_depth / 8;
+    pub fn stream(&self, stream_id: &str, chunk_size: u16, data: &[i32]) -> Result<(), String> {
+        let bit_depth: u16;
+
+        let result = self.execute_command(format!("INFO '{}' 'bit_depth'", stream_id).as_str())?;
+        match result {
+            Types::Int(v)  => { bit_depth = v as u16 },
+            _                   => { return Err("Invalid bit depth".to_string()) }
+        }
+
+        let frame = Frame::new(stream_id);
+        let n = chunk_size / bit_depth / 8;
 
         data.chunks(n as usize).for_each(|chunk| {
-            let block = pack(chunk, info.bit_depth);
+            let block = pack(chunk, bit_depth);
             let encoded_frame = frame.pack(block.unwrap().as_mut_slice());
 
             let mut socket = self.pool.get().unwrap();

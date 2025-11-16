@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use crate::command::{Command, Info};
+use crate::command::Command;
 use crate::pack::Types;
 use crate::utils;
 
@@ -80,10 +80,6 @@ impl<'a> Pipeline<'a> {
 
     pub fn reset(&mut self) {
         self.commands.clear();
-    }
-
-    pub fn stream(&mut self, info: &Info, data: &[i32]) ->  Result<(), String> {
-        self.command.stream(info, data)
     }
 
 }

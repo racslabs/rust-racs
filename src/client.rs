@@ -1,7 +1,8 @@
-use crate::command::{Command, Info};
+use crate::command::Command;
 use crate::pack::Types;
 use crate::pipeline::Pipeline;
 use crate::socket::SocketPool;
+
 
 const DEFAULT_POOL_SIZE: usize = 2;
 
@@ -23,15 +24,15 @@ impl Client {
     pub fn execute_command(&self, command: &str) -> Result<Types, String> {
         self.command.execute_command(command)
     }
-    
-    pub fn stream(&self, info: &Info, data: &[i32]) ->  Result<(), String> {
-        self.command.stream(info, data)
+
+    pub fn stream(&mut self, stream_id: &str, chunk_size: u16, data: &[i32]) ->  Result<(), String> {
+        self.command.stream(stream_id, chunk_size, data)
     }
 
     pub fn pipeline(&'_ self) -> Pipeline<'_> {
         Pipeline::new(&self.command)
     }
-    
+
     pub fn close(self) {
         self.command.get_pool().close();
     }
