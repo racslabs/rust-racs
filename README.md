@@ -1,6 +1,6 @@
 # rust-racs
 
-rust-racs is the rust client library for RACS (Remote Audio Caching Server). 
+**rust-racs** is the rust client library for [RACS](https://github.com/racslabs/racs). 
 It provides access to all the RACS commands through a low-level API.
 
 
@@ -25,7 +25,7 @@ let client = Client::open_with_pool_size("127.0.0.1:6381", 5).unrwap();
 ### Streaming
 
 The ``pipeline`` function is used to chain together multiple RACS commands and execute them sequentially.
-In the below example, a new audio stream is created and opened. Then pcm data is chunked into frames 
+In the below example, a new audio stream is created and opened. Then PCM data is chunked into frames 
 and streamed to the RACS server.
 
 ```rust
@@ -119,7 +119,7 @@ if let Types::Int(ref_ms) = result.unwrap() {
 
 ```
 
-To extract raw PCM data without formating, do the following instead:
+To extract PCM data without formating, do the following instead:
 
 ```rust
 // Extract PCM data between `from` and `to`
@@ -129,7 +129,81 @@ let result = client
     .execute();
 
 if let Types::S32V(data) = result.unwrap() {
-    // Use PCM samples stored in Vec<i32>
+    // Use PCM samples stored in data: Vec<i32>
 }
-
 ```
+
+### Querying Streams and Metadata
+
+Stream ids stored in RACS can be queried using the ``list`` function.
+``list`` takes a glob pattern and returns a vector of streams ids matching the pattern.
+
+```rust
+use racs::Client;
+use racs::Types;
+
+// 1️⃣ Connect to the RACS server
+let client = Client::open("127.0.0.1:6381").unwrap();
+
+// 2️⃣ Run list command matching "*" pattern
+let result = client
+    .pipeline()
+    .list("*")
+    .execute();
+
+// 3️⃣ Print the list of stream ids
+if let Types::List(list) = result.unwrap() {
+    // [Str("Beethoven Piano Sonata No.1")]
+    println!("{:?}", list);
+}
+```
+
+Stream metadata can be queried using the ``info`` function. 
+``info`` takes the stream id and metadata attribute as parameters.
+
+```rust
+use racs::Client;
+use racs::Types;
+
+// 1️⃣ Connect to the RACS server
+let client = Client::open("127.0.0.1:6381").unwrap();
+
+// 2️⃣ Get sample rate attribute for stream
+let result = client
+    .pipeline()
+    .info("Beethoven Piano Sonata No.1", "sample_rate")
+    .execute();
+
+// 3️⃣ Print the sample rate
+if let Types::Int(sample_rate) = result.unwrap() {
+    println!("{:?}", sample_rate);
+}
+```
+
+``i64`` is returned for all metadata attributes. The supported attributes are:
+
+| Attribute       | Description                                |
+|-----------------|--------------------------------------------|
+| `channels`      | Channel count of the audio stream.         |
+| `sample_rate`   | Sample rate of the audio stream (Hz).      |
+| `bit_depth`     | Bit depth of the audio stream.             |
+| `ref`           | Reference timestamp (milliseconds UTC).    |
+| `size`          | Size of audio stream in bytes.             |
+
+### Raw Command Execution
+
+To execute raw command strings, use the ``execute_command`` function.
+
+```rust
+use racs::Client;
+use racs::Types;
+
+let client = Client::open("127.0.0.1:6381").unwrap();
+
+let result = client.execute_command("EXTRACT 'Chopin Etude No.4' 2024-12-20T22:30:45.123Z 2024-12-21T02:56:16.123Z");
+
+if let Types::S32V(data) = result.unwrap() {
+    // Use PCM samples stored in data: Vec<i32>
+}
+```
+
