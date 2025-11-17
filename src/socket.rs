@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
-use std::io::{BufReader, BufWriter, Read, Result, Write};
+use std::io::{BufReader, BufWriter, Read, Write};
 use std::net::{SocketAddr, TcpStream};
 use std::str::FromStr;
 use std::usize;
@@ -13,7 +13,7 @@ pub struct SocketPool {
 
 impl SocketPool {
 
-    pub fn new(addr: &str, size: usize) -> Self {
+    pub fn new(addr: &str, size: usize) -> Result<Self, String> {
         let pool = Arc::new(Mutex::new(VecDeque::with_capacity(size)));
 
         for _ in 0..size {
@@ -24,7 +24,7 @@ impl SocketPool {
             pool.lock().unwrap().push_back(socket);
         }
 
-        Self { pool,  size}
+        Ok(Self { pool,  size })
     }
 
     pub fn get(&self) -> Option<TcpStream> {
@@ -39,30 +39,32 @@ impl SocketPool {
         self.size
     }
 
-    pub fn close(&self) {
+    pub fn close(&self) -> Result<(), String> {
         let mut pool = self.pool.lock().unwrap();
         pool.drain(..);
+        
+        Ok(())
     }
 }
 
-pub fn send(stream: &mut TcpStream, data: &[u8]) -> Result<Vec<u8>> {
+pub fn send(stream: &mut TcpStream, data: &[u8]) -> Result<Vec<u8>, String> {
     let prefix = data.len().to_le_bytes();
 
     {
         let mut writer = BufWriter::new(&mut *stream);
-        writer.write_all(&prefix)?;
-        writer.write_all(data)?;
-        writer.flush()?;
+        writer.write_all(&prefix).unwrap();
+        writer.write_all(data).unwrap();
+        writer.flush().unwrap();
     }
 
     let mut reader = BufReader::new(stream);
 
     let mut len_buf = [0u8; 8];
-    reader.read_exact(&mut len_buf)?;
+    reader.read_exact(&mut len_buf).unwrap();
     let len = u64::from_le_bytes(len_buf) as usize;
 
     let mut buf = vec![0u8; len];
-    reader.read_exact(&mut buf)?;
+    reader.read_exact(&mut buf).unwrap();
 
     Ok(buf)
 }

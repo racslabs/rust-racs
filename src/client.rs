@@ -11,14 +11,23 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn open(address: &str) -> Self {
-        let pool = SocketPool::new(address, DEFAULT_POOL_SIZE);
-        Self { command: Command::new(pool) }
+    pub fn open(address: &str) -> Result<Self, String> {
+        let pool = SocketPool::new(address, DEFAULT_POOL_SIZE)?;
+        Ok(
+            Self {
+                command: Command::new(pool)
+            }
+        )
+
     }
 
-    pub fn open_with_pool_size(address: &str, pool_size: usize) -> Self {
-        let pool = SocketPool::new(address, pool_size);
-        Self { command: Command::new(pool) }
+    pub fn open_with_pool_size(address: &str, pool_size: usize) -> Result<Self, String> {
+        let pool = SocketPool::new(address, pool_size)?;
+        Ok(
+            Self {
+                command: Command::new(pool)
+            }
+        )
     }
 
     pub fn execute_command(&self, command: &str) -> Result<Types, String> {
@@ -33,8 +42,8 @@ impl Client {
         Pipeline::new(&self.command)
     }
 
-    pub fn close(self) {
-        self.command.get_pool().close();
+    pub fn close(self) -> Result<(), String> {
+        self.command.get_pool().close()
     }
 }
 

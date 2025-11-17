@@ -11,7 +11,7 @@ To open a connection, simply create a client using ``open``.
 ```rust
 use racs::Client;
 
-let client = Client::open("127.0.0.1:6381");
+let client = Client::open("127.0.0.1:6381").unwrap();
 ```
 
 The ``open`` function creates a client with a default connection pool size of 3. 
@@ -19,7 +19,7 @@ To specify the connection pool size, use ``open_with_pool_size``.
 ```rust
 use racs::Client;
 
-let client = Client::open_with_pool_size("127.0.0.1:6381", 5);
+let client = Client::open_with_pool_size("127.0.0.1:6381", 5).unrwap();
 ```
 
 ### Streaming
@@ -32,7 +32,7 @@ and streamed to the RACS server.
 use racs::Client;
 
 // 1️⃣ Connect to a RACS server
-let client = Client::open("127.0.0.1:6381");
+let client = Client::open("127.0.0.1:6381").unwrap();
 
 // 2️⃣ Create a new audio stream and open it using pipeline
 client
@@ -77,7 +77,7 @@ use racs::Client;
 use racs::Types;
 
 // 1️⃣ Connect to the RACS server
-let client = Client::open("127.0.0.1:6381");
+let client = Client::open("127.0.0.1:6381").unwrap();
 
 // 2️⃣ Get the reference timestamp (in milliseconds)
 let result = client
@@ -115,6 +115,21 @@ if let Types::Int(ref_ms) = result.unwrap() {
         let mut file = File::create("beethoven.mp3").unwrap();
         file.write_all(&data).unwrap();
     }
+}
+
+```
+
+To extract raw PCM data without formating, do the following instead:
+
+```rust
+// Extract PCM data between `from` and `to`
+let result = client
+    .pipeline()
+    .extract("Beethoven Piano Sonata No.1", from, to)
+    .execute();
+
+if let Types::S32V(data) = result.unwrap() {
+    // Use PCM samples stored in Vec<i32>
 }
 
 ```
