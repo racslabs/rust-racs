@@ -6,10 +6,5 @@ mod utils;
 mod pipeline;
 pub mod client;
 
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn it_works() {
-    }
-}
+pub use crate::client::Client as Client;
+pub use crate::pack::Types as Types;

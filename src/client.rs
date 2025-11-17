@@ -4,7 +4,7 @@ use crate::pipeline::Pipeline;
 use crate::socket::SocketPool;
 
 
-const DEFAULT_POOL_SIZE: usize = 2;
+const DEFAULT_POOL_SIZE: usize = 3;
 
 pub struct Client {
     command: Command
@@ -16,7 +16,7 @@ impl Client {
         Self { command: Command::new(pool) }
     }
 
-    pub fn with_pool_size(address: &str, pool_size: usize) -> Self {
+    pub fn open_with_pool_size(address: &str, pool_size: usize) -> Self {
         let pool = SocketPool::new(address, pool_size);
         Self { command: Command::new(pool) }
     }
