@@ -7,4 +7,4 @@ mod pipeline;
 pub mod client;
 
 pub use crate::client::Client as Client;
-pub use crate::pack::Types as Types;
+pub use crate::pack::Type as Type;

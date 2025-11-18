@@ -4,7 +4,7 @@ use num_complex::Complex32;
 
 
 #[derive(Debug)]
-pub enum Types {
+pub enum Type {
     Int(i64),
     Float(f64),
     Bool(bool),
@@ -17,46 +17,46 @@ pub enum Types {
     U32V(Vec<u32>),
     S32V(Vec<i32>),
     C64V(Vec<Complex32>),
-    List(Vec<Types>)
+    List(Vec<Type>)
 }
 
-fn unpack_str(reader: &[u8]) -> Result<Types, String> {
+fn unpack_string(reader: &[u8]) -> Result<Type, String> {
     let (v, _) = decode::read_str_from_slice(reader).unwrap();
-    Ok(Types::String(v.to_string()))
+    Ok(Type::String(v.to_string()))
 }
 
-fn unpack_err(reader: &[u8]) -> Result<Types, String> {
+fn unpack_err(reader: &[u8]) -> Result<Type, String> {
     let (v, _) = decode::read_str_from_slice(reader).unwrap();
     Err(v.to_string())
 }
 
-fn unpack_int(mut reader: &[u8]) -> Result<Types, String> {
+fn unpack_int(mut reader: &[u8]) -> Result<Type, String> {
     let v = decode::read_int(&mut reader).unwrap();
-    Ok(Types::Int(v))
+    Ok(Type::Int(v))
 }
 
-fn unpack_float(mut reader: &[u8]) -> Result<Types, String> {
+fn unpack_float(mut reader: &[u8]) -> Result<Type, String> {
     let v = decode::read_f64(&mut reader).unwrap();
-    Ok(Types::Float(v))
+    Ok(Type::Float(v))
 }
 
-fn unpack_bool(mut reader: &[u8]) -> Result<Types, String> {
+fn unpack_bool(mut reader: &[u8]) -> Result<Type, String> {
     let v = decode::read_bool(&mut reader).unwrap();
-    Ok(Types::Bool(v))
+    Ok(Type::Bool(v))
 }
 
-fn unpack_nil() -> Result<Types, String> {
-    Ok(Types::Null)
+fn unpack_null() -> Result<Type, String> {
+    Ok(Type::Null)
 }
 
-fn unpack_u8v(mut reader: &[u8]) -> Result<Types, String> {
+fn unpack_u8v(mut reader: &[u8]) -> Result<Type, String> {
     let v = decode::read_bin_len(&mut reader).unwrap();
     let mut data = vec![0u8; v as usize];
     reader.read_exact(&mut data).unwrap();
-    Ok(Types::U8V(data))
+    Ok(Type::U8V(data))
 }
 
-fn unpack_u16v(mut reader: &[u8]) -> Result<Types, String> {
+fn unpack_u16v(mut reader: &[u8]) -> Result<Type, String> {
     let v = decode::read_bin_len(&mut reader).unwrap();
     let mut data = vec![0u8; v as usize];
 
@@ -66,10 +66,10 @@ fn unpack_u16v(mut reader: &[u8]) -> Result<Types, String> {
         .map(|b| u16::from_le_bytes([b[0], b[1]]))
         .collect();
 
-    Ok(Types::U16V(u16v))
+    Ok(Type::U16V(u16v))
 }
 
-fn unpack_s16v(mut reader: &[u8]) -> Result<Types, String> {
+fn unpack_s16v(mut reader: &[u8]) -> Result<Type, String> {
     let v = decode::read_bin_len(&mut reader).unwrap();
     let mut data = vec![0u8; v as usize];
 
@@ -79,10 +79,10 @@ fn unpack_s16v(mut reader: &[u8]) -> Result<Types, String> {
         .map(|b| i16::from_le_bytes([b[0], b[1]]))
         .collect();
 
-    Ok(Types::S16V(s16v))
+    Ok(Type::S16V(s16v))
 }
 
-fn unpack_u32v(mut reader: &[u8]) -> Result<Types, String> {
+fn unpack_u32v(mut reader: &[u8]) -> Result<Type, String> {
     let v = decode::read_bin_len(&mut reader).unwrap();
     let mut data = vec![0u8; v as usize];
 
@@ -92,10 +92,10 @@ fn unpack_u32v(mut reader: &[u8]) -> Result<Types, String> {
         .map(|b| u32::from_le_bytes([b[0], b[1], b[2], b[3]]))
         .collect();
 
-    Ok(Types::U32V(u32v))
+    Ok(Type::U32V(u32v))
 }
 
-fn unpack_s32v(mut reader: &[u8]) -> Result<Types, String> {
+fn unpack_s32v(mut reader: &[u8]) -> Result<Type, String> {
     let v = decode::read_bin_len(&mut reader).unwrap();
     let mut data = vec![0u8; v as usize];
 
@@ -106,10 +106,10 @@ fn unpack_s32v(mut reader: &[u8]) -> Result<Types, String> {
         .collect();
 
 
-    Ok(Types::S32V(i32v))
+    Ok(Type::S32V(i32v))
 }
 
-fn unpack_c64v(mut reader: &[u8]) -> Result<Types, String> {
+fn unpack_c64v(mut reader: &[u8]) -> Result<Type, String> {
     let v = decode::read_bin_len(&mut reader).unwrap();
     let mut data = vec![0u8; v as usize];
 
@@ -123,16 +123,16 @@ fn unpack_c64v(mut reader: &[u8]) -> Result<Types, String> {
             Complex32::new(re, im)
         }).collect();
 
-    Ok(Types::C64V(c64v))
+    Ok(Type::C64V(c64v))
 }
 
-fn unpack_list(mut reader: &[u8], n: u32) -> Result<Types, String> {
+fn unpack_list(mut reader: &[u8], n: u32) -> Result<Type, String> {
     let mut v = Vec::new();
 
     if n > 1 {
         loop {
             let (s, rem) = decode::read_str_from_slice(reader).unwrap();
-            v.push(Types::String(s.into()));
+            v.push(Type::String(s.into()));
 
             if rem.is_empty() { break }
             reader = rem;
@@ -140,10 +140,10 @@ fn unpack_list(mut reader: &[u8], n: u32) -> Result<Types, String> {
     }
 
     v.reverse();
-    Ok(Types::List(v))
+    Ok(Type::List(v))
 }
 
-pub fn unpack(buf: &[u8]) -> Result<Types, String> {
+pub fn unpack(buf: &[u8]) -> Result<Type, String> {
     let mut reader: &[u8] = &buf[..];
 
     let len = decode::read_array_len(&mut reader).unwrap();
@@ -155,12 +155,12 @@ pub fn unpack(buf: &[u8]) -> Result<Types, String> {
     reader = rem;
 
     match _type {
-        "string"      => { unpack_str(&mut reader) }
+        "string"      => { unpack_string(&mut reader) }
         "error"       => { unpack_err(&mut reader) }
         "bool"        => { unpack_bool(&mut reader) }
         "int"         => { unpack_int(&mut reader) }
         "float"       => { unpack_float(&mut reader) }
-        "null"        => { unpack_nil() }
+        "null"        => { unpack_null() }
         "u8v" | "s8v" => { unpack_u8v(&mut reader) }
         "u16v"        => { unpack_u16v(&mut reader) }
         "s16v"        => { unpack_s16v(&mut reader) }

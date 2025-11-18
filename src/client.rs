@@ -1,5 +1,5 @@
 use crate::command::Command;
-use crate::pack::Types;
+use crate::pack::Type;
 use crate::pipeline::Pipeline;
 use crate::socket::SocketPool;
 
@@ -30,7 +30,7 @@ impl Client {
         )
     }
 
-    pub fn execute_command(&self, command: &str) -> Result<Types, String> {
+    pub fn execute_command(&self, command: &str) -> Result<Type, String> {
         self.command.execute_command(command)
     }
 

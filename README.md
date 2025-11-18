@@ -31,10 +31,10 @@ and streamed to the RACS server.
 ```rust
 use racs::Client;
 
-// 1️⃣ Connect to a RACS server
+// Connect to a RACS server
 let client = Client::open("127.0.0.1:6381").unwrap();
 
-// 2️⃣ Create a new audio stream and open it using pipeline
+// Create a new audio stream and open it using pipeline
 client
     .pipeline()
     .create(
@@ -47,10 +47,10 @@ client
     .execute()  // execute all pipelined commands
     .unwrap();
 
-// 3️⃣ Prepare PCM samples (interleaved L/R, 16- or 24-bit integers)
+// Prepare PCM samples (interleaved L/R, 16- or 24-bit integers)
 let samples: Vec<i32> = /* your PCM audio data */;
 
-// 4️⃣ Stream audio data to the server
+// Stream audio data to the server
 client
     .stream(
         "Beethoven Piano Sonata No.1",
@@ -59,7 +59,7 @@ client
     )
     .unwrap();
 
-// 5️⃣ Close the stream when finished
+// Close the stream when finished
 client
     .pipeline()
     .close("Beethoven Piano Sonata No.1")
@@ -76,27 +76,27 @@ use chrono::{DateTime, Days, TimeZone, Utc};
 use racs::Client;
 use racs::Types;
 
-// 1️⃣ Connect to the RACS server
+// Connect to the RACS server
 let client = Client::open("127.0.0.1:6381").unwrap();
 
-// 2️⃣ Get the reference timestamp (in milliseconds)
+// Get the reference timestamp (in milliseconds)
 let result = client
     .pipeline()
     .info("Beethoven Piano Sonata No.1", "ref")
     .execute();
 
-if let Types::Int(ref_ms) = result.unwrap() {
+if let Type::Int(ref_ms) = result.unwrap() {
 
-    // 3️⃣ Convert milliseconds to DateTime<Utc>
+    // Convert milliseconds to DateTime<Utc>
     let from = Utc.timestamp_millis_opt(ref_ms).unwrap();
 
-    // 4️⃣ Compute end time by adding one day 
+    // Compute end time by adding one day 
     let to = from
         .checked_add_days(Days::new(1))
         .unwrap();
 
-    // 5️⃣ Extract PCM data between `from` and `to`
-    // 6️⃣ Convert (format) the audio to MP3
+    // Extract PCM data between `from` and `to`
+    // Convert (format) the audio to MP3
     let result = client
         .pipeline()
         .extract("Beethoven Piano Sonata No.1", from, to)
@@ -108,9 +108,9 @@ if let Types::Int(ref_ms) = result.unwrap() {
         )
         .execute();
 
-    if let Types::U8V(data) = result.unwrap() {
+    if let Type::U8V(data) = result.unwrap() {
 
-        // 7️⃣ Use or save the MP3 bytes
+        // Use or save the MP3 bytes
         // e.g. write them to a file
         let mut file = File::create("beethoven.mp3").unwrap();
         file.write_all(&data).unwrap();
@@ -128,7 +128,7 @@ let result = client
     .extract("Beethoven Piano Sonata No.1", from, to)
     .execute();
 
-if let Types::S32V(data) = result.unwrap() {
+if let Type::S32V(data) = result.unwrap() {
     // Use PCM samples stored in data: Vec<i32>
 }
 ```
@@ -142,16 +142,16 @@ Stream ids stored in RACS can be queried using the ``list`` function.
 use racs::Client;
 use racs::Types;
 
-// 1️⃣ Connect to the RACS server
+// Connect to the RACS server
 let client = Client::open("127.0.0.1:6381").unwrap();
 
-// 2️⃣ Run list command matching "*" pattern
+// Run list command matching "*" pattern
 let result = client
     .pipeline()
     .list("*")
     .execute();
 
-// 3️⃣ Print the list of stream ids
+// Print the list of stream ids
 if let Types::List(list) = result.unwrap() {
     // [Str("Beethoven Piano Sonata No.1")]
     println!("{:?}", list);
@@ -168,16 +168,16 @@ Stream metadata can be queried using the ``info`` function.
 use racs::Client;
 use racs::Types;
 
-// 1️⃣ Connect to the RACS server
+// Connect to the RACS server
 let client = Client::open("127.0.0.1:6381").unwrap();
 
-// 2️⃣ Get sample rate attribute for stream
+// Get sample rate attribute for stream
 let result = client
     .pipeline()
     .info("Beethoven Piano Sonata No.1", "sample_rate")
     .execute();
 
-// 3️⃣ Print the sample rate
+// Print the sample rate
 if let Types::Int(sample_rate) = result.unwrap() {
     println!("{:?}", sample_rate);
 }
@@ -205,7 +205,7 @@ let client = Client::open("127.0.0.1:6381").unwrap();
 
 let result = client.execute_command("EXTRACT 'Chopin Etude No.4' 2024-12-20T22:30:45.123Z 2024-12-21T02:56:16.123Z");
 
-if let Types::S32V(data) = result.unwrap() {
+if let Type::S32V(data) = result.unwrap() {
     // Use PCM samples stored in data: Vec<i32>
 }
 ```
@@ -217,16 +217,21 @@ Refer to the documentation in [RACS](https://github.com/racslabs/racs) for the c
 
 Below is a table of conversions for the ``Types`` enum between RACS and rust:
 
-| RACS            | Rust       |
-|-----------------|------------|
-| `Types::Int`    | `i64`      |
-| `Types::Float`  | `f64`      |
-| `Types::Bool`   | `bool`     |
-| `Types::String` | `String`   |
-| `Types::Error`  | `Err`      | 
-| `Types::Null`   | N/A        |
-| `Types::U8V`    | `Vec<u8>`  |
-| `types::U16V`   | `Vec<u16>` |
+| RACS           | Rust             |
+|----------------|------------------|
+| `Type::Int`    | `i64`            |
+| `Type::Float`  | `f64`            |
+| `Type::Bool`   | `bool`           |
+| `Type::String` | `String`         |
+| `Type::Error`  | `Err`            | 
+| `Type::Null`   | N/A              |
+| `Type::U8V`    | `Vec<u8>`        |
+| `Type::U16V`   | `Vec<u16>`       |
+| `Type::S16V`   | `Vec<i16>`       |  
+| `Type::U32V`   | `Vec<u32>`       |
+| `Type::S32V`   | `Vec<i32>`       |
+| `Type::C64V`   | `Vec<Complex32>` |
+| `Type::List`   | `Vec<Types>`     |
 
 
 

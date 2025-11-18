@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use crate::command::Command;
-use crate::pack::Types;
+use crate::pack::Type;
 use crate::utils;
 
 
@@ -72,7 +72,7 @@ impl<'a> Pipeline<'a> {
         self
     }
 
-    pub fn execute(&mut self) -> Result<Types, String> {
+    pub fn execute(&mut self) -> Result<Type, String> {
         let command = self.commands.join(" |> ");
         println!("{}", command);
         self.command.execute_command(command.as_str())

@@ -1,7 +1,7 @@
 use crate::socket::{send, SocketPool};
 use crate::utils::pack;
 use crate::frame::Frame;
-use crate::pack::{unpack, Types};
+use crate::pack::{unpack, Type};
 
 
 pub struct Command {
@@ -18,7 +18,7 @@ impl Command {
 
         let result = self.execute_command(format!("INFO '{}' 'bit_depth'", stream_id).as_str())?;
         match result {
-            Types::Int(v)  => { bit_depth = v as u16 },
+            Type::Int(v)  => { bit_depth = v as u16 },
             _                   => { return Err("Invalid bit depth".to_string()) }
         }
 
@@ -39,7 +39,7 @@ impl Command {
         Ok(())
     }
 
-    pub fn execute_command(&self, cmd: &str) -> Result<Types, String> {
+    pub fn execute_command(&self, cmd: &str) -> Result<Type, String> {
         let mut socket = self.pool.get().unwrap();
         let mut bytes = cmd.as_bytes().to_vec();
 
