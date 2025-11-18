@@ -158,6 +158,9 @@ if let Types::List(list) = result.unwrap() {
 }
 ```
 
+> [!NOTE]
+> String is the only element type currently supported for ``Types::List``
+
 Stream metadata can be queried using the ``info`` function. 
 ``info`` takes the stream id and metadata attribute as parameters.
 
@@ -206,4 +209,25 @@ if let Types::S32V(data) = result.unwrap() {
     // Use PCM samples stored in data: Vec<i32>
 }
 ```
+
+Refer to the documentation in [RACS](https://github.com/racslabs/racs) for the commands.
+
+
+## Type Conversions
+
+Below is a table of conversions for the ``Types`` enum between RACS and rust:
+
+| RACS            | Rust       |
+|-----------------|------------|
+| `Types::Int`    | `i64`      |
+| `Types::Float`  | `f64`      |
+| `Types::Bool`   | `bool`     |
+| `Types::String` | `String`   |
+| `Types::Error`  | `Err`      | 
+| `Types::Null`   | N/A        |
+| `Types::U8V`    | `Vec<u8>`  |
+| `types::U16V`   | `Vec<u16>` |
+
+
+
 

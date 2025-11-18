@@ -8,9 +8,9 @@ pub enum Types {
     Int(i64),
     Float(f64),
     Bool(bool),
-    Str(String),
-    Err(String),
-    NULL,
+    String(String),
+    Error(String),
+    Null,
     U8V(Vec<u8>),
     U16V(Vec<u16>),
     S16V(Vec<i16>),
@@ -22,7 +22,7 @@ pub enum Types {
 
 fn unpack_str(reader: &[u8]) -> Result<Types, String> {
     let (v, _) = decode::read_str_from_slice(reader).unwrap();
-    Ok(Types::Str(v.to_string()))
+    Ok(Types::String(v.to_string()))
 }
 
 fn unpack_err(reader: &[u8]) -> Result<Types, String> {
@@ -46,7 +46,7 @@ fn unpack_bool(mut reader: &[u8]) -> Result<Types, String> {
 }
 
 fn unpack_nil() -> Result<Types, String> {
-    Ok(Types::NULL)
+    Ok(Types::Null)
 }
 
 fn unpack_u8v(mut reader: &[u8]) -> Result<Types, String> {
@@ -132,7 +132,7 @@ fn unpack_list(mut reader: &[u8], n: u32) -> Result<Types, String> {
     if n > 1 {
         loop {
             let (s, rem) = decode::read_str_from_slice(reader).unwrap();
-            v.push(Types::Str(s.into()));
+            v.push(Types::String(s.into()));
 
             if rem.is_empty() { break }
             reader = rem;
