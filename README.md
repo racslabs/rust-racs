@@ -1,7 +1,21 @@
 # rust-racs
 
+[![crates.io](https://img.shields.io/crates/v/racs.svg)](https://crates.io/crates/racs)
+
 **rust-racs** is the rust client library for [RACS](https://github.com/racslabs/racs). 
 It provides access to all the RACS commands through a low-level API.
+
+
+## Installation
+
+Run the following Cargo command in your project directory:
+```
+cargo add racs
+```
+Or add the following line to your Cargo.toml:
+```
+racs = "0.1.0"
+```
 
 
 ## Basic Operations
