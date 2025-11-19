@@ -2,6 +2,11 @@
 name = "racs"
 version = "0.1.0"
 edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "rust client library for RACS"
+repository = "https://github.com/racslabs/rust-racs"
+readme = "README.md"
+keywords = ["audio", "audio-cache"]
 
 [dependencies]
 rmp = "0.8.14"

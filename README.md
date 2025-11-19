@@ -72,9 +72,11 @@ The below example retrieves a reference timestamp, and uses it to extract an aud
 It then converts the extracted PCM data into MP3 format and writes the resulting bytes to a file.
 
 ```rust
-use chrono::{DateTime, Days, TimeZone, Utc};
+use chrono::{Days, TimeZone, Utc};
 use racs::Client;
-use racs::Types;
+use racs::Type;
+use std::fs::File;
+use std::io::Write;
 
 // Connect to the RACS server
 let client = Client::open("127.0.0.1:6381").unwrap();
@@ -140,7 +142,7 @@ Stream ids stored in RACS can be queried using the ``list`` function.
 
 ```rust
 use racs::Client;
-use racs::Types;
+use racs::Type;
 
 // Connect to the RACS server
 let client = Client::open("127.0.0.1:6381").unwrap();
@@ -152,21 +154,21 @@ let result = client
     .execute();
 
 // Print the list of stream ids
-if let Types::List(list) = result.unwrap() {
+if let Type::List(list) = result.unwrap() {
     // [Str("Beethoven Piano Sonata No.1")]
     println!("{:?}", list);
 }
 ```
 
 > [!NOTE]
-> String is the only element type currently supported for ``Types::List``
+> ``String`` is the only element type currently supported for ``Types::List``
 
 Stream metadata can be queried using the ``info`` function. 
 ``info`` takes the stream id and metadata attribute as parameters.
 
 ```rust
 use racs::Client;
-use racs::Types;
+use racs::Type;
 
 // Connect to the RACS server
 let client = Client::open("127.0.0.1:6381").unwrap();
@@ -178,7 +180,7 @@ let result = client
     .execute();
 
 // Print the sample rate
-if let Types::Int(sample_rate) = result.unwrap() {
+if let Type::Int(sample_rate) = result.unwrap() {
     println!("{:?}", sample_rate);
 }
 ```
@@ -199,14 +201,13 @@ To execute raw command strings, use the ``execute_command`` function.
 
 ```rust
 use racs::Client;
-use racs::Types;
+use racs::Type;
 
 let client = Client::open("127.0.0.1:6381").unwrap();
 
-let result = client.execute_command("EXTRACT 'Chopin Etude No.4' 2024-12-20T22:30:45.123Z 2024-12-21T02:56:16.123Z");
+let result = client.execute_command("EVAL '(+ 1 2 3)'");
 
-if let Type::S32V(data) = result.unwrap() {
-    // Use PCM samples stored in data: Vec<i32>
+if let Type::INT(num) = result.unwrap() {
 }
 ```
 
