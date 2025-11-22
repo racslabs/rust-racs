@@ -175,7 +175,7 @@ if let Type::List(list) = result.unwrap() {
 ```
 
 > [!NOTE]
-> ``String`` is the only element type currently supported for ``Types::List``
+> ``String`` is the only element type currently supported for ``Type::List``
 
 Stream metadata can be queried using the ``info`` function. 
 ``info`` takes the stream id and metadata attribute as parameters.
