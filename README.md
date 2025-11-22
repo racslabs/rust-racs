@@ -169,7 +169,7 @@ let result = client
 
 // Print the list of stream ids
 if let Type::List(list) = result.unwrap() {
-    // [Str("Beethoven Piano Sonata No.1")]
+    // [String("Beethoven Piano Sonata No.1")]
     println!("{:?}", list);
 }
 ```
@@ -221,7 +221,7 @@ let client = Client::open("127.0.0.1:6381").unwrap();
 
 let result = client.execute_command("EVAL '(+ 1 2 3)'");
 
-if let Type::INT(num) = result.unwrap() {
+if let Type::Int(num) = result.unwrap() {
 }
 ```
 
@@ -230,7 +230,7 @@ Refer to the documentation in [RACS](https://github.com/racslabs/racs) for the c
 
 ## Type Conversions
 
-Below is a table of conversions for the ``Types`` enum between RACS and rust:
+Below is a table of conversions for the ``Type`` enum between RACS and rust:
 
 | RACS           | Rust             |
 |----------------|------------------|
@@ -246,7 +246,7 @@ Below is a table of conversions for the ``Types`` enum between RACS and rust:
 | `Type::U32V`   | `Vec<u32>`       |
 | `Type::S32V`   | `Vec<i32>`       |
 | `Type::C64V`   | `Vec<Complex32>` |
-| `Type::List`   | `Vec<Types>`     |
+| `Type::List`   | `Vec<Type>`      |
 
 
 
