@@ -14,7 +14,7 @@ cargo add racs
 ```
 Or add the following line to your Cargo.toml:
 ```
-racs = "0.1.0"
+racs = "0.1.1"
 ```
 
 
