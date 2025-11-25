@@ -151,8 +151,8 @@ if let Type::S32V(data) = result.unwrap() {
 
 ### Querying Streams and Metadata
 
-Stream ids stored in RACS can be queried using the ``list`` function.
-``list`` takes a glob pattern and returns a vector of streams ids matching the pattern.
+Stream ids stored in RACS can be queried using the ``search`` function.
+``search`` takes a glob pattern and returns a vector of streams ids matching the pattern.
 
 ```rust
 use racs::Client;
@@ -164,7 +164,7 @@ let client = Client::open("127.0.0.1:6381").unwrap();
 // Run list command matching "*" pattern
 let result = client
     .pipeline()
-    .list("*")
+    .search("*")
     .execute();
 
 // Print the list of stream ids

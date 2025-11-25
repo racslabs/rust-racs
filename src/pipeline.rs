@@ -38,8 +38,8 @@ impl<'a> Pipeline<'a> {
         self
     }
 
-    pub fn list(&mut self, pattern: &str) -> &mut Self {
-        let command = format!("LS '{}'", pattern);
+    pub fn search(&mut self, pattern: &str) -> &mut Self {
+        let command = format!("SEARCH '{}'", pattern);
         self.commands.push(command);
         self
     }
