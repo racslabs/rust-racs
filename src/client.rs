@@ -34,8 +34,8 @@ impl Client {
         self.command.execute_command(command)
     }
 
-    pub fn stream(&mut self, stream_id: &str, chunk_size: u16, data: &[i32]) ->  Result<(), String> {
-        self.command.stream(stream_id, chunk_size, data)
+    pub fn stream(&mut self, stream_id: &str, chunk_size: u16, data: &[i32], batch_size: u32, compression: bool) -> Result<(), String> {
+        self.command.stream(stream_id, chunk_size, data, batch_size, compression)
     }
 
     pub fn pipeline(&'_ self) -> Pipeline<'_> {

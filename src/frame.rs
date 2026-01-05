@@ -1,9 +1,6 @@
 
 use crate::utils;
 
-const DEFAULT_FLAGS: u8 = 0x0;
-
-
 pub(crate) struct Frame {
     chunk_id: &'static [u8; 3],
     session_id: [u8; 16],
@@ -12,12 +9,12 @@ pub(crate) struct Frame {
 }
 
 impl Frame {
-    pub fn new(stream_id: &str) -> Self {
+    pub fn new(stream_id: &str, flags: u8) -> Self {
         Frame {
             chunk_id: b"rsp",
             session_id: utils::session_id(),
             hash: utils::hash(stream_id.as_bytes()),
-            flags: DEFAULT_FLAGS,
+            flags,
         }
     }
 
