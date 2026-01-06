@@ -1,8 +1,5 @@
 use uuid::Uuid;
 
-const DEFAULT_COMPRESSION_LEVEL: i32 = 3;
-
-
 pub fn pack(data: &[i32], bit_depth: u16) -> Option<Vec<u8>> {
     match bit_depth {
         16 => {
@@ -33,7 +30,7 @@ pub fn hash(bytes: &[u8]) -> u64 {
     h1
 }
 
-pub fn compress(data: &[u8]) -> Vec<u8> {
-    zstd::bulk::compress(data, DEFAULT_COMPRESSION_LEVEL)
+pub fn compress(data: &[u8], compression_level: i32) -> Vec<u8> {
+    zstd::bulk::compress(data, compression_level)
         .expect("zstd compress failed")
 }

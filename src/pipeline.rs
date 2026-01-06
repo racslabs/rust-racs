@@ -71,7 +71,6 @@ impl<'a> Pipeline<'a> {
 
     pub fn execute(&mut self) -> Result<Type, String> {
         let command = self.commands.join(" |> ");
-        println!("{}", command);
         self.command.execute_command(command.as_str())
     }
 
