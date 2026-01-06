@@ -117,6 +117,8 @@ if let Type::U8V(data) = result {
 
 ```
 
+### Metadata
+
 Stream metadata can be retrieved using the ``meta`` command. ``meta`` takes the stream id and metadata attribute as parameters.
 
 ```rust
