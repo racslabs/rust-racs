@@ -22,7 +22,7 @@ impl Command {
             stream_id: stream_id.into(),
             chunk_size: DEFAULT_CHUNK_SIZE,
             batch_size: DEFAULT_BATCH_SIZE,
-            compression: false,
+            compression: true,
             compression_level: DEFAULT_COMPRESSION_LEVEL,
             command: self,
         }

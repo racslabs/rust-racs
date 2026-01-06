@@ -36,7 +36,7 @@ let client = Client::open_with_pool_size("127.0.0.1:6381", 5).unrwap();
 ### Streaming Audio
 
 The ``pipeline`` function is used to chain together multiple RACS commands and execute them sequentially.
-In the below example, a new audio stream is created and opened. Then PCM data is chunked into frames
+In the below example, a new audio stream is created. Then PCM data is chunked into frames
 and streamed to the RACS server.
 
 ```rust
@@ -67,9 +67,7 @@ client.stream("vocals")
 If `chunk_size`, `batch_size`, `compression` and `compression_level` are not provided, the default values will be used.
 ```rust
 // Stream audio data to the server
-client.stream("vocals")
-    .execute(&samples)
-    .unwrap();
+client.stream("vocals").execute(&samples).unwrap();
 ```
 
 
