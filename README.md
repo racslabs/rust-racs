@@ -57,9 +57,9 @@ let samples: Vec<i32> = /* your PCM audio data */
 // Stream audio data to the server
 client.stream("vocals")
     .chunk_size(1024 * 32) // 32 KB
-    .batch_size(100)
+    .batch_size(50)
     .compression(true)
-    .compression_level(8)
+    .compression_level(8) // ZSTD levels: 0-8
     .execute(&samples)
     .unwrap();
 ```
@@ -117,7 +117,7 @@ if let Type::U8V(data) = result {
 
 ```
 
-Stream metadata can be queried using the ``meta`` command. ``info`` takes the stream id and metadata attribute as parameters.
+Stream metadata can be retrieved using the ``meta`` command. ``meta`` takes the stream id and metadata attribute as parameters.
 
 ```rust
 use racs::Client;
@@ -135,7 +135,7 @@ let result = client
 // Print the sample rate
 if let Type::Int(sample_rate) = result.unwrap() {
     // 44100
-    println!("{:?}", sample_rate);
+    println!("{}", sample_rate);
 }
 ```
 
