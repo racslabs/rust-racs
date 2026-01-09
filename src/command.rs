@@ -1,42 +1,31 @@
-use crate::socket::{send, SocketPool};
-use crate::utils::pack;
-use crate::frame::Frame;
-use crate::pack::{unpack, Type};
 
+use crate::socket::{send, SocketPool};
+use crate::pack::{unpack, Type};
+pub(crate) use crate::stream::Stream;
 
 pub struct Command {
-    pool: SocketPool
+    pub(crate) pool: SocketPool
 }
+
+const DEFAULT_CHUNK_SIZE: u16 = 1024 * 32;
+const DEFAULT_BATCH_SIZE: u32 = 50;
+const DEFAULT_COMPRESSION_LEVEL: i32 = 3;
+
 
 impl Command {
     pub(crate) fn new(pool: SocketPool) -> Self {
         Self { pool }
     }
 
-    pub fn stream(&self, stream_id: &str, chunk_size: u16, data: &[i32]) -> Result<(), String> {
-        let bit_depth: u16;
-
-        let result = self.execute_command(format!("INFO '{}' 'bit_depth'", stream_id).as_str())?;
-        match result {
-            Type::Int(v)  => { bit_depth = v as u16 },
-            _                   => { return Err("Invalid bit depth".to_string()) }
+    pub fn stream(&'_ self, stream_id: impl Into<String>) -> Stream<'_> {
+        Stream {
+            stream_id: stream_id.into(),
+            chunk_size: DEFAULT_CHUNK_SIZE,
+            batch_size: DEFAULT_BATCH_SIZE,
+            compression: true,
+            compression_level: DEFAULT_COMPRESSION_LEVEL,
+            command: self,
         }
-
-        let frame = Frame::new(stream_id);
-        let n = chunk_size / bit_depth / 8;
-
-        data.chunks(n as usize).for_each(|chunk| {
-            let block = pack(chunk, bit_depth);
-            let encoded_frame = frame.pack(block.unwrap().as_mut_slice());
-
-            let mut socket = self.pool.get().unwrap();
-            let response = send(&mut socket, encoded_frame.as_slice()).unwrap();
-            self.pool.put(socket);
-
-            let _type = unpack(response.as_slice()).unwrap();
-        });
-
-        Ok(())
     }
 
     pub fn execute_command(&self, cmd: &str) -> Result<Type, String> {
@@ -44,7 +33,7 @@ impl Command {
         let mut bytes = cmd.as_bytes().to_vec();
 
         bytes.push('\0' as u8);
-        let response = send(&mut socket, bytes.as_slice()).unwrap();
+        let response = send(&mut socket, bytes.as_slice())?;
         self.pool.put(socket);
 
         unpack(response.as_slice())

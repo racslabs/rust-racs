@@ -1,6 +1,4 @@
-use chrono::{DateTime, Utc};
 use uuid::Uuid;
-
 
 pub fn pack(data: &[i32], bit_depth: u16) -> Option<Vec<u8>> {
     match bit_depth {
@@ -32,6 +30,7 @@ pub fn hash(bytes: &[u8]) -> u64 {
     h1
 }
 
-pub fn rfc3339(timestamp: DateTime<Utc>) -> String {
-    timestamp.format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string()
+pub fn compress(data: &[u8], compression_level: i32) -> Vec<u8> {
+    zstd::bulk::compress(data, compression_level)
+        .expect("zstd compress failed")
 }

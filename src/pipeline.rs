@@ -1,8 +1,5 @@
-use chrono::{DateTime, Utc};
 use crate::command::Command;
 use crate::pack::Type;
-use crate::utils;
-
 
 pub struct Pipeline<'a> {
     command: &'a Command,
@@ -14,14 +11,14 @@ impl<'a> Pipeline<'a> {
         Self { command, commands: vec![] }
     }
 
-    pub fn extract(&mut self, stream_id: &str, from: DateTime<Utc>, to: DateTime<Utc>) -> &mut Self {
-        let command = format!("EXTRACT '{}' {} {}", stream_id, utils::rfc3339(from), utils::rfc3339(to));
+    pub fn range(&mut self, stream_id: &str, start: f32, duration: f32) -> &mut Self {
+        let command = format!("RANGE '{}' {:.6} {:.6}", stream_id, start, duration);
         self.commands.push(command);
         self
     }
 
-    pub fn format(&mut self, mime_type: &str, sample_rate: u32, channels: u16, bit_depth: u16) -> &mut Self {
-        let command = format!("FORMAT '{}' {} {} {}", mime_type, sample_rate, channels, bit_depth);
+    pub fn encode(&mut self, mime_type: &str) -> &mut Self {
+        let command = format!("ENCODE '{}'", mime_type);
         self.commands.push(command);
         self
     }
@@ -32,14 +29,14 @@ impl<'a> Pipeline<'a> {
         self
     }
 
-    pub fn info(&mut self, stream_id: &str, attr: &str) -> &mut Self {
-        let command = format!("INFO '{}' '{}'", stream_id, attr);
+    pub fn meta(&mut self, stream_id: &str, attr: &str) -> &mut Self {
+        let command = format!("META '{}' '{}'", stream_id, attr);
         self.commands.push(command);
         self
     }
 
-    pub fn search(&mut self, pattern: &str) -> &mut Self {
-        let command = format!("SEARCH '{}'", pattern);
+    pub fn list(&mut self, pattern: &str) -> &mut Self {
+        let command = format!("LIST '{}'", pattern);
         self.commands.push(command);
         self
     }
@@ -74,7 +71,6 @@ impl<'a> Pipeline<'a> {
 
     pub fn execute(&mut self) -> Result<Type, String> {
         let command = self.commands.join(" |> ");
-        println!("{}", command);
         self.command.execute_command(command.as_str())
     }
 
