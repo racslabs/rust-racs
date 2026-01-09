@@ -1,6 +1,6 @@
 [package]
 name = "racs"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 description = "rust client library for RACS"
@@ -15,4 +15,3 @@ mur3 = "0.1"
 crc32c = "0.6"
 uuid = { version = "1", features = ["v4"] }
 zstd = "0.13"
-hound = "3.4"
